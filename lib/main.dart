@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:stock_manager/models/product.dart';
+import 'package:stock_manager/product_scanner.dart';
+import 'package:stock_manager/providers/product_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
-  runApp(const MainApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
+  await Hive.initFlutter();
+  Hive.registerAdapter(ProductAdapter());
+
+  // Open a box to store products
+  await Hive.openBox<Product>('products');
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ProductProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      title: 'Inventor.IO',
+      home: ProductScannerPage(),
     );
   }
 }
